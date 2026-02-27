@@ -43,4 +43,42 @@ public class PomiApplication {
  * sudo systemctl start arify
  * sudo journalctl -u arify -f
  * ---------------------------------------------
+ * 
+ * npm create vite@latest arify-web
+ * 
+ * 
+ * git init
+ * git add .
+ * git commit -m "Initial React setup"
+ * cd arify-web
+ * npm install
+ * npm run dev
+ * npm run build
+ * git init
+ * git add .
+ * git commit -m "Initial React setup"
+ * git remote add origin https://github.com/yourusername/arify-frontend.git
+ * git branch -M main
+ * git push -u origin main
+ * git remote remove origin
+ * git remote add origin https://github.com/rangakg/arify-frontend.git
+ * git branch -M main
+ * git push -u origin main
+ * git remote -v
+ * 
+ * ------------------------------------
+ * ssh arify@37.27.82.89
+ * 
+ * arify@ubuntu-4gb-hel1-1:~$ sudo -u postgres psql
+ * [sudo] password for arify:
+ * psql (16.11 (Ubuntu 16.11-0ubuntu0.24.04.1))
+ * Type "help" for help.
+ * 
+ * postgres=# \c arify
+ * You are now connected to database "arify" as user "postgres".
+ * arify=#
+ * 
+ * password is Pomi12345
+ * 
+ * 
  */
