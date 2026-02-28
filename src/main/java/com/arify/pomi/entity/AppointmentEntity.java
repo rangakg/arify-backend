@@ -10,22 +10,17 @@ import lombok.Setter;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "appointments", uniqueConstraints = @UniqueConstraint(columnNames = { "slot_id" }))
+@Table(name = "appointments")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class AppointmentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_phone", nullable = false)
-    private UserEntity user;
+    @Column(name = "phone")
+    private String phone;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
@@ -36,10 +31,15 @@ public class AppointmentEntity {
     private SlotEntity slot;
 
     @Enumerated(EnumType.STRING)
-    private AppointmentStatus status = AppointmentStatus.CREATED;
+    @Column(nullable = false)
+    private AppointmentStatus status;
+
+    @Column(name = "order_id")
+    private String orderId;
 
     @Column(name = "created_at")
-    private OffsetDateTime createdAt = OffsetDateTime.now();
+    private OffsetDateTime createdAt;
 
-    // getters & setters
+    @Column(name = "confirmed_at")
+    private OffsetDateTime confirmedAt;
 }

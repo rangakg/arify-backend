@@ -68,7 +68,7 @@ public class BookingService {
         }
 
         AppointmentEntity appointment = new AppointmentEntity();
-        appointment.setUser(user);
+        appointment.setPhone(user.getPhone());
         appointment.setDoctor(doctor);
         appointment.setSlot(slot);
         appointment.setStatus(AppointmentStatus.CREATED);

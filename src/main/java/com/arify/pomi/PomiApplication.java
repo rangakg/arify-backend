@@ -78,7 +78,13 @@ public class PomiApplication {
  * You are now connected to database "arify" as user "postgres".
  * arify=#
  * 
- * password is Pomi12345
+ * arify password is Pomi12345
+ * ----------------------------------
+ * sudo nano /etc/systemd/system/arify.service
  * 
- * 
+ * --------------------------
+ * NGINX configuration
+ * sudo nano /etc/nginx/sites-available/arify
+ * sudo nginx -t
+ * sudo systemctl reload nginx
  */
