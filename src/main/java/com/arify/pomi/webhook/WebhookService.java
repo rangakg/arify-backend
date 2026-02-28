@@ -92,7 +92,7 @@ public class WebhookService {
             // EXISTING USER
             // ----------------------------------
 
-            boolean hasAppointment = apptRepo.existsByUserPhoneAndStatus(phone, AppointmentStatus.CREATED);
+            boolean hasAppointment = apptRepo.existsByPhoneAndStatus(phone, AppointmentStatus.CREATED);
 
             if (hasAppointment) {
 

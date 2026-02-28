@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Long> {
 
-    boolean existsByUserPhoneAndStatus(String phone, AppointmentStatus status);
-
+    boolean existsByPhoneAndStatus(String phone, AppointmentStatus status);
 }
