@@ -38,7 +38,7 @@ public class BookingService {
     }
 
     public List<DoctorDTO> getDoctors(Long serviceId) {
-        return doctorRepo.findByServiceIdAndActiveTrue(serviceId)
+        return doctorRepo.findByService_IdAndActiveTrue(serviceId)
                 .stream()
                 .map(d -> new DoctorDTO(d.getId(), d.getName()))
                 .toList();

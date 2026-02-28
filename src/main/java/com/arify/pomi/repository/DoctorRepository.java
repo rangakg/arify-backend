@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<DoctorEntity, Long> {
-    List<DoctorEntity> findByServiceIdAndActiveTrue(Long serviceId);
+
+    List<DoctorEntity> findByService_IdAndActiveTrue(Long serviceId);
 }
