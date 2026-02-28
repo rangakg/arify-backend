@@ -23,9 +23,6 @@ public class DoctorEntity {
 
     private Boolean active = true;
 
-    @Column(name = "created_at")
-    private OffsetDateTime createdAt = OffsetDateTime.now();
-
     // ===== GETTERS =====
 
     public Long getId() {
@@ -46,10 +43,6 @@ public class DoctorEntity {
 
     public Boolean getActive() {
         return active;
-    }
-
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
     }
 
     // ===== SETTERS =====
@@ -74,7 +67,4 @@ public class DoctorEntity {
         this.active = active;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }

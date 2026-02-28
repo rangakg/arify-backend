@@ -33,8 +33,5 @@ public class SlotEntity {
     @Enumerated(EnumType.STRING)
     private SlotStatus status = SlotStatus.AVAILABLE;
 
-    @Column(name = "created_at")
-    private OffsetDateTime createdAt = OffsetDateTime.now();
-
     // getters & setters
 }
