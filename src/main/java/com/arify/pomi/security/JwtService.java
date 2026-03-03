@@ -1,6 +1,8 @@
 package com.arify.pomi.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -22,32 +24,43 @@ public class JwtService {
         String role = userDetails.getAuthorities()
                 .stream()
                 .findFirst()
-                .get()
+                .orElseThrow()
                 .getAuthority();
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + 86400000))
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
-    public boolean isTokenValid(String token,
-            UserDetails userDetails) {
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
 
-        String username = extractUsername(token);
-        return username.equals(userDetails.getUsername());
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractAllClaims(token).getExpiration();
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            return !extractExpiration(token).before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
