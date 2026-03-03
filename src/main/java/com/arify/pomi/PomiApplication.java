@@ -87,4 +87,14 @@ public class PomiApplication {
  * sudo nano /etc/nginx/sites-available/arify
  * sudo nginx -t
  * sudo systemctl reload nginx
+ * 
+ * 
+ * new BCryptPasswordEncoder().encode("admin123")
+ * 
+ * INSERT INTO staff_users (username, password, role)
+ * VALUES (
+ * 'admin',
+ * '$2a$10$yourbcryptvaluehere',
+ * 'ADMIN'
+ * );
  */
