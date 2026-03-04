@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // ✅ Skip authentication endpoints
+        // Skip login endpoints
         if (path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
@@ -52,9 +52,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String username = jwtService.extractUsername(jwt);
-        String role = jwtService.extractRole(jwt); // 🔥 extract role from token
+        String role = jwtService.extractRole(jwt);
 
-        // Create authority directly from JWT role
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

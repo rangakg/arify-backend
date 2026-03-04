@@ -31,9 +31,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/frontdesk/**")
-                        .hasAnyRole("ADMIN", "FRONT_DESK")
+                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_FRONT_DESK")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter,
                         UsernamePasswordAuthenticationFilter.class);
@@ -46,7 +46,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Spring Boot will automatically use this
     @Bean
     public DaoAuthenticationProvider authenticationProvider(
             CustomUserDetailsService userDetailsService,
