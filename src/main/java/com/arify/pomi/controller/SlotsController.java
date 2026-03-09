@@ -2,36 +2,56 @@ package com.arify.pomi.controller;
 
 import com.arify.pomi.entity.SlotEntity;
 import com.arify.pomi.repository.SlotRepository;
-
+import com.arify.pomi.repository.DoctorRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.arify.pomi.entity.SlotStatus;
 
 @RestController
 @RequestMapping("/api/slots")
 public class SlotsController {
 
-    private final SlotRepository slotRepository;
+    private final SlotRepository slotRepo;
+    private final DoctorRepository doctorRepo;
 
-    public SlotsController(SlotRepository slotRepository) {
-        this.slotRepository = slotRepository;
+    public SlotsController(SlotRepository slotRepo,
+            DoctorRepository doctorRepo) {
+        this.slotRepo = slotRepo;
+        this.doctorRepo = doctorRepo;
     }
 
-    // List all slots
     @GetMapping
-    public List<SlotEntity> getAllSlots() {
-        return slotRepository.findAll();
+    public List<SlotEntity> list() {
+        return slotRepo.findAll();
     }
 
-    // Create slot
     @PostMapping
     public SlotEntity createSlot(@RequestBody SlotEntity slot) {
-        return slotRepository.save(slot);
+
+        slot.setDoctor(
+                doctorRepo.findById(
+                        slot.getDoctor().getId()).orElseThrow());
+
+        slot.setStatus(SlotStatus.AVAILABLE);
+
+        return slotRepo.save(slot);
     }
 
-    // Delete slot
+    @PutMapping("/{id}")
+    public SlotEntity update(@PathVariable Long id,
+            @RequestBody SlotEntity updated) {
+
+        SlotEntity slot = slotRepo.findById(id).orElseThrow();
+
+        slot.setSlotTime(updated.getSlotTime());
+        slot.setStatus(updated.getStatus());
+
+        return slotRepo.save(slot);
+    }
+
     @DeleteMapping("/{id}")
-    public void deleteSlot(@PathVariable Long id) {
-        slotRepository.deleteById(id);
+    public void delete(@PathVariable Long id) {
+        slotRepo.deleteById(id);
     }
 }
