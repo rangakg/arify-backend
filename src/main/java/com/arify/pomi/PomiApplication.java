@@ -398,5 +398,10 @@ public class PomiApplication {
  * -H "Content-Type: application/json" -d '{
  * [{"id":1,"name":"Oncology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":2,"name":"General
  * Consultation","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":3,"name":"Cardiology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":4,"name":"Nephrology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":5,"name":"Dermatology","active":true,"createdAt":null}]arify@ubuntu-4gb-hel1-1:~/arify-frontend$
+ * -------------------------------------------------
+ * VERY VERT Impoertent
+ * arify@ubuntu-4gb-hel1-1:~/arify-backend$ curl -X POST
+ * http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d
+ * '{"username":"admin","password":"admin123"}'
  * 
  */
