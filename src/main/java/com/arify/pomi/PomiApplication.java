@@ -369,5 +369,34 @@ public class PomiApplication {
  * remote: Resolving deltas: 100% (4/4), completed with 4 local objects.
  * To github.com:rangakg/arify-frontend.git
  * 3aabdd3..6da982d main -> main
+ * -----------------------------------------------------------------------
+ * arify@ubuntu-4gb-hel1-1:~/arify-frontend$ curl -X POST
+ * http://localhost:8080/api/auth/login \
+ * -H "Content-Type: application/json" \
+ * -d '{"username":"admin","password":"admin123"}'
+ * {"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzczMDc0NTEzLCJleHAiOjE3NzMxNjA5MTN9.KO__Fnj5QQnkWMCt133PIDmxyW5JDASEZRO1HimiaLw"}arify@ubuntu-4gb-hel1-1:~/arify-frontend$
+ * arify@ubuntu-4gb-hel1-1:~/arify-frontend$
+ * arify@ubuntu-4gb-hel1-1:~/arify-frontend$
+ * arify@ubuntu-4gb-hel1-1:~/arify-frontend$ curl
+ * http://localhost:8080/api/admin/services \
+ * -H "Authorization: Bearer
+ * eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzczMDc0NTEzLCJleHAiOjE3NzMxNjA5MTN9.KO__Fnj5QQnkWMCt133PIDmxyW5JDASEZRO1HimiaLw"
+ * [{"id":1,"name":"Oncology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":2,"name":"General
+ * Consultation","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":3,"name":"Cardiology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":4,"name":"Nephrology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"}]arify@ubuntu-4gb-hel1-1:~/arify-frontend$
+ * arify@ubuntu-4gb-hel1-1:~/arify-frontend$ curl -X POST
+ * http://localhost:8080/api/admin/services \
+ * -H "Authorization: Bearer
+ * eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzczMDc0NTEzLCJleHAiOjE3NzMxNjA5MTN9.KO__Fnj5QQnkWMCt133PIDmxyW5JDASEZRO1HimiaLw"
+ * \
+ * -H "Content-Type: application/json" \
+ * -d '{
+ * "name":"Dermatology"
+ * }'
+ * arify@ubuntu-4gb-hel1-1:~/arify-frontend$
+ * ,"crehttp://localhost:8080/api/admin/services -H "Authorization: Bearer
+ * eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzczMDc0NTEzLCJleHAiOjE3NzMxNjA5MTN9.KO__Fnj5QQnkWMCt133PIDmxyW5JDASEZRO1HimiaLw"5JDASEZRO1HimiaLw"
+ * -H "Content-Type: application/json" -d '{
+ * [{"id":1,"name":"Oncology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":2,"name":"General
+ * Consultation","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":3,"name":"Cardiology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":4,"name":"Nephrology","active":true,"createdAt":"2026-02-28T10:19:53.359359Z"},{"id":5,"name":"Dermatology","active":true,"createdAt":null}]arify@ubuntu-4gb-hel1-1:~/arify-frontend$
  * 
  */
