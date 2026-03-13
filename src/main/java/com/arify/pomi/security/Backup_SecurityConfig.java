@@ -15,11 +15,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableMethodSecurity
-public class SecurityConfig {
+public class Backup_SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+    public Backup_SecurityConfig(JwtAuthenticationFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
 
@@ -28,30 +28,14 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
                 .authorizeHttpRequests(auth -> auth
-
-                        // Authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-
-                        // Public booking APIs (WhatsApp + React booking page)
-                        .requestMatchers("/api/public/**").permitAll()
-
-                        // Admin APIs
-                        .requestMatchers("/api/admin/**")
-                        .hasAuthority("ROLE_ADMIN")
-
-                        // Front desk APIs
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/frontdesk/**")
                         .hasAnyAuthority("ROLE_ADMIN", "ROLE_FRONT_DESK")
-
-                        // Everything else requires authentication
                         .anyRequest().authenticated())
-
-                .addFilterBefore(
-                        jwtFilter,
+                .addFilterBefore(jwtFilter,
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
