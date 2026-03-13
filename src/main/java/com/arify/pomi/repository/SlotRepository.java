@@ -2,7 +2,9 @@ package com.arify.pomi.repository;
 
 import com.arify.pomi.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -13,5 +15,17 @@ public interface SlotRepository extends JpaRepository<SlotEntity, Long> {
     boolean existsByDoctorAndSlotTime(
             DoctorEntity doctor,
             OffsetDateTime slotTime);
+
+    @Query("""
+            SELECT s
+            FROM SlotEntity s
+            WHERE s.doctor.id = :doctorId
+            AND DATE(s.slotTime) = :date
+            AND s.status = 'AVAILABLE'
+            ORDER BY s.slotTime
+            """)
+    List<SlotEntity> findAvailableSlots(
+            Long doctorId,
+            LocalDate date);
 
 }
