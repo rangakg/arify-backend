@@ -32,24 +32,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-
-                        // Authentication endpoints
+                        .requestMatchers("/webhook/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-
-                        // Public booking APIs (WhatsApp + React booking page)
                         .requestMatchers("/api/public/**").permitAll()
-
-                        // Admin APIs
-                        .requestMatchers("/api/admin/**")
-                        .hasAuthority("ROLE_ADMIN")
-
-                        // Front desk APIs
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/frontdesk/**")
                         .hasAnyAuthority("ROLE_ADMIN", "ROLE_FRONT_DESK")
-
-                        // Everything else requires authentication
                         .anyRequest().authenticated())
-
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class);
