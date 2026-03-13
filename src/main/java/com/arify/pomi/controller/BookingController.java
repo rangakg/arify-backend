@@ -32,7 +32,7 @@ public class BookingController {
     }
 
     @PostMapping("/appointments")
-    public void book(@RequestBody AppointmentRequestDTO request) {
+    public void book(@RequestBody AppointmentRequest request) {
         bookingService.bookAppointment(request);
     }
 }

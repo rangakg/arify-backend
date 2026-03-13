@@ -52,7 +52,7 @@ public class BookingService {
     }
 
     @Transactional
-    public void bookAppointment(AppointmentRequestDTO request) {
+    public void bookAppointment(AppointmentRequest request) {
 
         UserEntity user = userRepo.findById(request.getUserPhone())
                 .orElseThrow(() -> new RuntimeException("User not found"));

@@ -1,10 +1,27 @@
 package com.arify.pomi.dto;
 
-public class AppointmentRequestDTO {
+public class AppointmentRequest {
 
+    private String token;
+    private Long slotId;
     private String userPhone;
     private Long doctorId;
-    private Long slotId;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public Long getSlotId() {
+        return slotId;
+    }
+
+    public void setSlotId(Long slotId) {
+        this.slotId = slotId;
+    }
 
     public String getUserPhone() {
         return userPhone;
@@ -20,13 +37,5 @@ public class AppointmentRequestDTO {
 
     public void setDoctorId(Long doctorId) {
         this.doctorId = doctorId;
-    }
-
-    public Long getSlotId() {
-        return slotId;
-    }
-
-    public void setSlotId(Long slotId) {
-        this.slotId = slotId;
     }
 }
