@@ -31,14 +31,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // Skip login endpoints
-        if (path.startsWith("/api/auth")) {
+        // ✅ Skip authentication for public endpoints
+        if (path.startsWith("/api/auth")
+                || path.startsWith("/api/public")
+                || path.startsWith("/webhook")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
         final String authHeader = request.getHeader("Authorization");
 
+        // No JWT → continue without authentication
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -46,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String jwt = authHeader.substring(7);
 
+        // Invalid token → ignore
         if (!jwtService.isTokenValid(jwt)) {
             filterChain.doFilter(request, response);
             return;
