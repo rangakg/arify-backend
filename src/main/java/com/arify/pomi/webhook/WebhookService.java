@@ -10,6 +10,7 @@ import com.arify.pomi.entity.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @Service
 public class WebhookService {
@@ -21,15 +22,18 @@ public class WebhookService {
 
     private final UserRepository userRepo;
     private final AppointmentRepository apptRepo;
+    private final JdbcTemplate jdbcTemplate;
 
     public WebhookService(
             MetaMessageSender sender,
             UserRepository userRepo,
-            AppointmentRepository apptRepo) {
+            AppointmentRepository apptRepo,
+            JdbcTemplate jdbcTemplate) {
 
         this.sender = sender;
         this.userRepo = userRepo;
         this.apptRepo = apptRepo;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void processIncoming(String payload, String signature) {
@@ -80,10 +84,20 @@ public class WebhookService {
 
                 userRepo.save(u);
 
+                // generate booking token
+                String token = java.util.UUID.randomUUID().toString();
+
+                // store token
+                jdbcTemplate.update(
+                        "INSERT INTO booking_tokens(token, phone, expires_at) VALUES (?, ?, now() + interval '30 minutes')",
+                        token,
+                        phone);
+
+                // send booking link
                 sender.sendTextMessage(phone,
                         "Thanks " + text +
-                                "\n\nBook here:\n" +
-                                "https://arifysolutions.co.in/book?phone=" + phone);
+                                "\n\nBook your appointment:\n" +
+                                "https://arifysolutions.co.in/book?t=" + token);
 
                 return;
             }
