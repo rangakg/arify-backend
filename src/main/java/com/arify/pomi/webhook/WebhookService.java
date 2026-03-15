@@ -88,11 +88,7 @@ public class WebhookService {
                 // generate token
                 String token = generateToken(phone);
 
-                sender.sendTextMessage(
-                        phone,
-                        "Thanks " + text +
-                                "\n\nBook your appointment here:\n" +
-                                "https://arifysolutions.co.in/book?t=" + token);
+                sender.sendBookingButton(phone, token);
 
                 return;
             }
@@ -115,11 +111,7 @@ public class WebhookService {
             // generate token for existing user
             String token = generateToken(phone);
 
-            sender.sendTextMessage(
-                    phone,
-                    "Continue booking here:\n" +
-                            "https://arifysolutions.co.in/book?t=" + token);
-
+            sender.sendBookingButton(phone, token);
         } catch (Exception e) {
 
             log.error("Webhook error", e);

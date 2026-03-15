@@ -36,4 +36,32 @@ public class MetaMessageSender {
 
         restTemplate.postForEntity(url, request, String.class);
     }
+
+    public void sendBookingButton(String to, String token) {
+
+        String url = "https://graph.facebook.com/v21.0/" + phoneNumberId + "/messages";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(accessToken);
+
+        Map<String, Object> body = Map.of(
+                "messaging_product", "whatsapp",
+                "to", to,
+                "type", "interactive",
+                "interactive", Map.of(
+                        "type", "cta_url",
+                        "body", Map.of(
+                                "text", "Click below to book your appointment"),
+                        "action", Map.of(
+                                "name", "cta_url",
+                                "parameters", Map.of(
+                                        "display_text", "Book Appointment",
+                                        "url", "https://arifysolutions.co.in/book?t=" + token))));
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        restTemplate.postForEntity(url, request, String.class);
+    }
+
 }
