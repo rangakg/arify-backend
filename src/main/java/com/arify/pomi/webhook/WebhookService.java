@@ -53,7 +53,8 @@ public class WebhookService {
 
             String phone = messageNode.path("from").asText();
 
-            String text = messageNode.path("text")
+            String text = messageNode
+                    .path("text")
                     .path("body")
                     .asText()
                     .trim();
@@ -63,67 +64,101 @@ public class WebhookService {
             var userOpt = userRepo.findById(phone);
 
             // ----------------------------------
-            // NEW USER
+            // STEP 1 : USER NOT REGISTERED
             // ----------------------------------
 
             if (userOpt.isEmpty()) {
 
-                if (text.equalsIgnoreCase("hi")
-                        || text.equalsIgnoreCase("book")) {
+                if (text.equalsIgnoreCase("hi") || text.equalsIgnoreCase("book")) {
 
-                    sender.sendTextMessage(phone,
+                    sender.sendTextMessage(
+                            phone,
                             "Welcome to Arify.\n\nPlease enter your name.");
 
                     return;
                 }
 
+                // Save new user
                 UserEntity u = new UserEntity();
-
                 u.setPhone(phone);
                 u.setName(text);
 
                 userRepo.save(u);
 
-                // generate booking token
-                String token = java.util.UUID.randomUUID().toString();
+                // generate token
+                String token = generateToken(phone);
 
-                // store token
-                jdbcTemplate.update(
-                        "INSERT INTO booking_tokens(token, phone, expires_at) VALUES (?, ?, now() + interval '30 minutes')",
-                        token,
-                        phone);
-
-                // send booking link
-                sender.sendTextMessage(phone,
+                sender.sendTextMessage(
+                        phone,
                         "Thanks " + text +
-                                "\n\nBook your appointment:\n" +
+                                "\n\nBook your appointment here:\n" +
                                 "https://arifysolutions.co.in/book?t=" + token);
 
                 return;
             }
 
             // ----------------------------------
-            // EXISTING USER
+            // STEP 2 : EXISTING USER
             // ----------------------------------
 
             boolean hasAppointment = apptRepo.existsByPhoneAndStatus(phone, AppointmentStatus.CREATED);
 
             if (hasAppointment) {
 
-                sender.sendTextMessage(phone,
+                sender.sendTextMessage(
+                        phone,
                         "You already have an appointment.");
 
                 return;
             }
 
-            sender.sendTextMessage(phone,
-                    "Continue booking:\n" +
-                            "https://arifysolutions.co.in/book?phone=" + phone);
+            // generate token for existing user
+            String token = generateToken(phone);
+
+            sender.sendTextMessage(
+                    phone,
+                    "Continue booking here:\n" +
+                            "https://arifysolutions.co.in/book?t=" + token);
 
         } catch (Exception e) {
 
             log.error("Webhook error", e);
         }
+    }
 
+    // ----------------------------------
+    // TOKEN GENERATION
+    // ----------------------------------
+
+    private String generateToken(String phone) {
+
+        // check existing valid token
+        var tokens = jdbcTemplate.query(
+                """
+                        SELECT token
+                        FROM booking_tokens
+                        WHERE phone = ?
+                        AND expires_at > now()
+                        LIMIT 1
+                        """,
+                (rs, rowNum) -> rs.getString("token"),
+                phone);
+
+        if (!tokens.isEmpty()) {
+            return tokens.get(0);
+        }
+
+        // otherwise create new token
+        String token = java.util.UUID.randomUUID().toString();
+
+        jdbcTemplate.update(
+                """
+                        INSERT INTO booking_tokens(token, phone, expires_at)
+                        VALUES (?, ?, now() + interval '30 minutes')
+                        """,
+                token,
+                phone);
+
+        return token;
     }
 }
