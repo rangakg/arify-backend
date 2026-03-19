@@ -28,17 +28,22 @@ public class SlotService {
     public void generateSlots(int days) {
 
         List<DoctorEntity> doctors = doctorRepository.findAll();
+
+        System.out.println("Doctors count: " + doctors.size());
+
         LocalDate today = LocalDate.now();
 
         for (DoctorEntity doctor : doctors) {
+
+            System.out.println("Generating for doctor: " + doctor.getId());
 
             for (int d = 0; d < days; d++) {
 
                 LocalDate date = today.plusDays(d);
 
-                createSlots(doctor, date, 9, 13); // Morning
-                createSlots(doctor, date, 14, 17); // Afternoon
-                createSlots(doctor, date, 17, 20); // Evening
+                createSlots(doctor, date, 9, 13);
+                createSlots(doctor, date, 14, 17);
+                createSlots(doctor, date, 17, 20);
             }
         }
     }
@@ -49,14 +54,12 @@ public class SlotService {
 
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        LocalDateTime startLocal = date.atTime(startHour, 0);
-        LocalDateTime endLocal = date.atTime(endHour, 0);
+        ZoneOffset offset = ZoneOffset.UTC; // ✅ FIXED TIMEZONE
 
-        ZoneOffset offset = OffsetDateTime.now().getOffset(); // current timezone
+        OffsetDateTime start = date.atTime(startHour, 0).atOffset(offset);
+        OffsetDateTime end = date.atTime(endHour, 0).atOffset(offset);
 
-        while (startLocal.isBefore(endLocal)) {
-
-            OffsetDateTime start = startLocal.atOffset(offset);
+        while (start.isBefore(end)) {
 
             boolean exists = slotRepository
                     .existsByDoctorAndSlotTime(doctor, start);
@@ -69,9 +72,11 @@ public class SlotService {
                 slot.setStatus(SlotStatus.AVAILABLE);
 
                 slotRepository.save(slot);
+
+                System.out.println("✅ Created slot: " + start);
             }
 
-            startLocal = startLocal.plusMinutes(15);
+            start = start.plusMinutes(15);
         }
     }
 }
