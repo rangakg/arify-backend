@@ -403,5 +403,10 @@ public class PomiApplication {
  * arify@ubuntu-4gb-hel1-1:~/arify-backend$ curl -X POST
  * http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d
  * '{"username":"admin","password":"admin123"}'
+ * ----------------------------------------------------------
+ * arify@ubuntu-4gb-hel1-1:~$ curl -X POST http://localhost:8080/api/auth/login
+ * -H "Content-Type: application/json" -d
+ * '{"username":"admin","password":"admin123"}'
+ * {"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzczNjcyNDc2LCJleHAiOjE3NzM3NTg4NzZ9.P_gok_wTGWYTUi7PAx4uXQrZfWbwfJGYbqVKN-1GA5A"}arify@ubuntu-4gb-hel1-1:~$
  * 
  */
