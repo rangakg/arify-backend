@@ -57,13 +57,24 @@ public class SlotService {
         LocalDateTime start = date.atTime(startHour, 0);
         LocalDateTime end = date.atTime(endHour, 0);
 
+        // 🔥 FORCE IST OFFSET
+        ZoneOffset IST = ZoneOffset.of("+05:30");
+
         while (start.isBefore(end)) {
 
+            // ✅ EXPLICIT IST (NO JVM / NO AUTO CONVERSION)
             OffsetDateTime slotTime = OffsetDateTime.of(
-                    start,
-                    ZoneOffset.ofHoursMinutes(5, 30));
+                    start.getYear(),
+                    start.getMonthValue(),
+                    start.getDayOfMonth(),
+                    start.getHour(),
+                    start.getMinute(),
+                    0,
+                    0,
+                    IST);
 
-            System.out.println("🧪 SLOT TIME: " + slotTime);
+            // 🔍 DEBUG (REMOVE LATER)
+            System.out.println("🧪 SLOT TIME: " + slotTime + " OFFSET: " + slotTime.getOffset());
 
             boolean exists = slotRepository
                     .existsByDoctorAndSlotTime(doctor, slotTime);
