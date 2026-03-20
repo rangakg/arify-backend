@@ -59,7 +59,9 @@ public class SlotService {
 
         while (start.isBefore(end)) {
 
-            OffsetDateTime slotTime = start.atZone(ZoneId.systemDefault()).toOffsetDateTime();
+            OffsetDateTime slotTime = OffsetDateTime.of(
+                    start,
+                    ZoneOffset.ofHoursMinutes(5, 30));
 
             System.out.println("🧪 SLOT TIME: " + slotTime);
 
