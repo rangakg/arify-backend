@@ -54,24 +54,23 @@ public class SlotService {
 
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        ZoneId zone = ZoneId.of("Asia/Kolkata");
-
-        ZonedDateTime startZoned = date.atTime(startHour, 0).atZone(zone);
-        ZonedDateTime endZoned = date.atTime(endHour, 0).atZone(zone);
-
-        OffsetDateTime start = startZoned.toOffsetDateTime();
-        OffsetDateTime end = endZoned.toOffsetDateTime();
+        LocalDateTime start = date.atTime(startHour, 0);
+        LocalDateTime end = date.atTime(endHour, 0);
 
         while (start.isBefore(end)) {
 
+            OffsetDateTime slotTime = start.atZone(ZoneId.systemDefault()).toOffsetDateTime();
+
+            System.out.println("🧪 SLOT TIME: " + slotTime);
+
             boolean exists = slotRepository
-                    .existsByDoctorAndSlotTime(doctor, start);
+                    .existsByDoctorAndSlotTime(doctor, slotTime);
 
             if (!exists) {
 
                 SlotEntity slot = new SlotEntity();
                 slot.setDoctor(doctor);
-                slot.setSlotTime(start);
+                slot.setSlotTime(slotTime);
                 slot.setStatus(SlotStatus.AVAILABLE);
 
                 slotRepository.save(slot);
