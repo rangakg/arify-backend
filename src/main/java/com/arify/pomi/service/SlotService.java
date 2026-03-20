@@ -54,10 +54,13 @@ public class SlotService {
 
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        ZoneOffset offset = ZoneOffset.UTC; // ✅ FIXED TIMEZONE
+        ZoneId zone = ZoneId.of("Asia/Kolkata");
 
-        OffsetDateTime start = date.atTime(startHour, 0).atOffset(offset);
-        OffsetDateTime end = date.atTime(endHour, 0).atOffset(offset);
+        ZonedDateTime startZoned = date.atTime(startHour, 0).atZone(zone);
+        ZonedDateTime endZoned = date.atTime(endHour, 0).atZone(zone);
+
+        OffsetDateTime start = startZoned.toOffsetDateTime();
+        OffsetDateTime end = endZoned.toOffsetDateTime();
 
         while (start.isBefore(end)) {
 
@@ -72,8 +75,6 @@ public class SlotService {
                 slot.setStatus(SlotStatus.AVAILABLE);
 
                 slotRepository.save(slot);
-
-                System.out.println("✅ Created slot: " + start);
             }
 
             start = start.plusMinutes(15);
