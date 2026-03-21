@@ -21,6 +21,9 @@ public class SlotService {
     @Autowired
     private SlotRepository slotRepository;
 
+    // ✅ Define IST once (BEST PRACTICE)
+    private static final ZoneId IST = ZoneId.of("Asia/Kolkata");
+
     // -----------------------
     // GENERATE SLOTS
     // -----------------------
@@ -31,7 +34,8 @@ public class SlotService {
 
         System.out.println("Doctors count: " + doctors.size());
 
-        LocalDate today = LocalDate.now();
+        // ✅ Always use IST date
+        LocalDate today = LocalDate.now(IST);
 
         for (DoctorEntity doctor : doctors) {
 
@@ -41,9 +45,9 @@ public class SlotService {
 
                 LocalDate date = today.plusDays(d);
 
-                createSlots(doctor, date, 9, 13);
-                createSlots(doctor, date, 14, 17);
-                createSlots(doctor, date, 17, 20);
+                createSlots(doctor, date, 9, 13); // Morning
+                createSlots(doctor, date, 14, 17); // Afternoon
+                createSlots(doctor, date, 17, 20); // Evening
             }
         }
     }
@@ -57,24 +61,11 @@ public class SlotService {
         LocalDateTime start = date.atTime(startHour, 0);
         LocalDateTime end = date.atTime(endHour, 0);
 
-        // 🔥 FORCE IST OFFSET
-        ZoneOffset IST = ZoneOffset.of("+05:30");
-
         while (start.isBefore(end)) {
 
-            // ✅ EXPLICIT IST (NO JVM / NO AUTO CONVERSION)
-            OffsetDateTime slotTime = OffsetDateTime.of(
-                    start.getYear(),
-                    start.getMonthValue(),
-                    start.getDayOfMonth(),
-                    start.getHour(),
-                    start.getMinute(),
-                    0,
-                    0,
-                    IST);
-
-            // 🔍 DEBUG (REMOVE LATER)
-            System.out.println("🧪 SLOT TIME: " + slotTime + " OFFSET: " + slotTime.getOffset());
+            // ✅ Correct timezone conversion (NO manual offset)
+            ZonedDateTime zdt = start.atZone(IST);
+            OffsetDateTime slotTime = zdt.toOffsetDateTime();
 
             boolean exists = slotRepository
                     .existsByDoctorAndSlotTime(doctor, slotTime);
@@ -90,6 +81,7 @@ public class SlotService {
             }
 
             start = start.plusMinutes(15);
+
         }
     }
 }
