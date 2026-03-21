@@ -58,14 +58,17 @@ public class SlotService {
 
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        LocalDateTime start = date.atTime(startHour, 0);
-        LocalDateTime end = date.atTime(endHour, 0);
+        ZonedDateTime start = date
+                .atTime(startHour, 0)
+                .atZone(ZoneId.of("Asia/Kolkata"));
+
+        ZonedDateTime end = date
+                .atTime(endHour, 0)
+                .atZone(ZoneId.of("Asia/Kolkata"));
 
         while (start.isBefore(end)) {
 
-            // ✅ Correct timezone conversion (NO manual offset)
-            ZonedDateTime zdt = start.atZone(IST);
-            OffsetDateTime slotTime = zdt.toOffsetDateTime();
+            OffsetDateTime slotTime = start.toOffsetDateTime();
 
             boolean exists = slotRepository
                     .existsByDoctorAndSlotTime(doctor, slotTime);
@@ -81,7 +84,6 @@ public class SlotService {
             }
 
             start = start.plusMinutes(15);
-
         }
     }
 }
