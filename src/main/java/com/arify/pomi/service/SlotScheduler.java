@@ -23,7 +23,7 @@ public class SlotScheduler {
     @Transactional
     public void refreshSlots() {
 
-        System.out.println("🕒 CRON STARTED");
+        System.out.println("🕒 CRON STARTED. New Version");
 
         // ✅ 1. Delete ONLY AVAILABLE slots
         slotRepository.deleteByStatus(SlotStatus.AVAILABLE);
