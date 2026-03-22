@@ -52,11 +52,10 @@ public class SlotScheduler {
 
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        ZoneOffset offset = ZoneOffset.UTC;
+        ZoneOffset offset = ZoneOffset.of("+05:30"); // ✅ IST
 
         OffsetDateTime start = date.atTime(startHour, 0).atOffset(offset);
         OffsetDateTime end = date.atTime(endHour, 0).atOffset(offset);
-
         while (start.isBefore(end)) {
 
             boolean exists = slotRepository
