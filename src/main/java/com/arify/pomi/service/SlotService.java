@@ -66,7 +66,9 @@ public class SlotService {
         while (start.isBefore(end)) {
 
             // ✅ CRITICAL FIX: convert to UTC before saving
-            OffsetDateTime slotTime = start.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+            // OffsetDateTime slotTime =
+            // start.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
+            OffsetDateTime slotTime = start.toOffsetDateTime();
 
             boolean exists = slotRepository
                     .existsByDoctorAndSlotTime(doctor, slotTime);
