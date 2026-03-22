@@ -58,17 +58,15 @@ public class SlotService {
 
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        ZonedDateTime start = date
-                .atTime(startHour, 0)
-                .atZone(ZoneId.of("Asia/Kolkata"));
+        ZoneId IST = ZoneId.of("Asia/Kolkata");
 
-        ZonedDateTime end = date
-                .atTime(endHour, 0)
-                .atZone(ZoneId.of("Asia/Kolkata"));
+        ZonedDateTime start = date.atTime(startHour, 0).atZone(IST);
+        ZonedDateTime end = date.atTime(endHour, 0).atZone(IST);
 
         while (start.isBefore(end)) {
 
-            OffsetDateTime slotTime = start.toOffsetDateTime();
+            // ✅ CRITICAL FIX: convert to UTC before saving
+            OffsetDateTime slotTime = start.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
 
             boolean exists = slotRepository
                     .existsByDoctorAndSlotTime(doctor, slotTime);
