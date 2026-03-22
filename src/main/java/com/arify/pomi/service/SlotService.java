@@ -55,35 +55,38 @@ public class SlotService {
     // -----------------------
     // CREATE SLOTS
     // -----------------------
-
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        ZoneId IST = ZoneId.of("Asia/Kolkata");
+        while (startHour < endHour) {
 
-        ZonedDateTime start = date.atTime(startHour, 0).atZone(IST);
-        ZonedDateTime end = date.atTime(endHour, 0).atZone(IST);
+            for (int minute = 0; minute < 60; minute += 15) {
 
-        while (start.isBefore(end)) {
+                OffsetDateTime slotTime = OffsetDateTime.of(
+                        date.getYear(),
+                        date.getMonthValue(),
+                        date.getDayOfMonth(),
+                        startHour,
+                        minute,
+                        0,
+                        0,
+                        ZoneOffset.of("+05:30") // 🔥 HARD FIX IST
+                );
 
-            // ✅ CRITICAL FIX: convert to UTC before saving
-            // OffsetDateTime slotTime =
-            // start.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
-            OffsetDateTime slotTime = start.toOffsetDateTime();
+                boolean exists = slotRepository
+                        .existsByDoctorAndSlotTime(doctor, slotTime);
 
-            boolean exists = slotRepository
-                    .existsByDoctorAndSlotTime(doctor, slotTime);
+                if (!exists) {
 
-            if (!exists) {
+                    SlotEntity slot = new SlotEntity();
+                    slot.setDoctor(doctor);
+                    slot.setSlotTime(slotTime);
+                    slot.setStatus(SlotStatus.AVAILABLE);
 
-                SlotEntity slot = new SlotEntity();
-                slot.setDoctor(doctor);
-                slot.setSlotTime(slotTime);
-                slot.setStatus(SlotStatus.AVAILABLE);
-
-                slotRepository.save(slot);
+                    slotRepository.save(slot);
+                }
             }
 
-            start = start.plusMinutes(15);
+            startHour++;
         }
     }
 }
