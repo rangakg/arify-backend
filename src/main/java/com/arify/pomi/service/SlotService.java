@@ -57,20 +57,20 @@ public class SlotService {
     // -----------------------
     private void createSlots(DoctorEntity doctor, LocalDate date, int startHour, int endHour) {
 
-        while (startHour < endHour) {
+        for (int hour = startHour; hour < endHour; hour++) {
 
             for (int minute = 0; minute < 60; minute += 15) {
 
+                // ✅ FORCE IST (NO JVM / NO UTC / NO CONVERSION)
                 OffsetDateTime slotTime = OffsetDateTime.of(
                         date.getYear(),
                         date.getMonthValue(),
                         date.getDayOfMonth(),
-                        startHour,
+                        hour,
                         minute,
                         0,
                         0,
-                        ZoneOffset.of("+05:30") // 🔥 HARD FIX IST
-                );
+                        ZoneOffset.of("+05:30"));
 
                 boolean exists = slotRepository
                         .existsByDoctorAndSlotTime(doctor, slotTime);
@@ -85,8 +85,6 @@ public class SlotService {
                     slotRepository.save(slot);
                 }
             }
-
-            startHour++;
         }
     }
 }
