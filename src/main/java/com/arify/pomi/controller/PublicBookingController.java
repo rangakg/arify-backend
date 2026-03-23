@@ -73,25 +73,4 @@ public class PublicBookingController {
     // CREATE APPOINTMENT (LOCK SLOT)
     // ----------------------------------------------------
 
-    @PostMapping("/appointments")
-    public Map<String, String> createAppointment(
-            @RequestBody AppointmentRequest req) {
-
-        String phone = tokenService.getPhone(req.getToken());
-
-        SlotEntity slot = slotRepo
-                .findById(req.getSlotId())
-                .orElseThrow();
-
-        AppointmentEntity a = new AppointmentEntity();
-
-        a.setPhone(phone);
-        a.setDoctor(slot.getDoctor());
-        a.setSlot(slot);
-        a.setStatus(AppointmentStatus.LOCKED);
-
-        appointmentRepo.save(a);
-
-        return Map.of("status", "success");
-    }
 }
