@@ -97,13 +97,18 @@ public class WebhookService {
             // STEP 2 : EXISTING USER
             // ----------------------------------
 
-            boolean hasAppointment = apptRepo.existsByPhoneAndStatus(phone, AppointmentStatus.CREATED);
+            // ----------------------------------
+            // STEP 2 : EXISTING USER
+            // ----------------------------------
+
+            boolean hasAppointment = apptRepo.existsByPhoneAndStatus(phone, AppointmentStatus.LOCKED)
+                    || apptRepo.existsByPhoneAndStatus(phone, AppointmentStatus.PAID);
 
             if (hasAppointment) {
 
                 sender.sendTextMessage(
                         phone,
-                        "You already have an appointment.");
+                        "You already have an active appointment.");
 
                 return;
             }

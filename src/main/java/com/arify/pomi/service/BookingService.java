@@ -71,7 +71,7 @@ public class BookingService {
         appointment.setPhone(user.getPhone());
         appointment.setDoctor(doctor);
         appointment.setSlot(slot);
-        appointment.setStatus(AppointmentStatus.CREATED);
+        appointment.setStatus(AppointmentStatus.LOCKED);
 
         appointmentRepo.save(appointment);
 
