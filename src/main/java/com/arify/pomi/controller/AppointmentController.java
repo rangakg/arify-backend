@@ -1,5 +1,7 @@
 package com.arify.pomi.controller;
 
+import com.arify.pomi.entity.SlotEntity;
+import com.arify.pomi.repository.SlotRepository;
 import com.arify.pomi.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,22 @@ import java.util.Map;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final SlotRepository slotRepo; // ✅ FIX
+
+    // -----------------------
+    // PREVIEW (NO DB WRITE)
+    // -----------------------
+    @GetMapping("/preview")
+    public Map<String, String> preview(@RequestParam Long slotId) {
+
+        SlotEntity slot = slotRepo.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Invalid slot"));
+
+        return Map.of(
+                "doctor", slot.getDoctor().getName(),
+                "date", slot.getSlotTime().toLocalDate().toString(),
+                "time", slot.getSlotTime().toLocalTime().toString());
+    }
 
     // -----------------------
     // CONFIRM BOOKING
@@ -24,28 +42,6 @@ public class AppointmentController {
 
         appointmentService.confirmBooking(phone, slotId);
 
-        return Map.of(
-                "message", "Appointment locked. Proceed to payment.");
-    }
-
-    // -----------------------
-    // PAYMENT SUCCESS (TEMP)
-    // -----------------------
-    @PostMapping("/success")
-    public String paymentSuccess(@RequestParam String phone,
-            @RequestParam String orderId) {
-
-        appointmentService.markPaymentSuccess(phone, orderId);
-        return "Payment successful";
-    }
-
-    // -----------------------
-    // PAYMENT FAILURE (TEMP)
-    // -----------------------
-    @PostMapping("/failed")
-    public String paymentFailed(@RequestParam String phone) {
-
-        appointmentService.markPaymentFailed(phone);
-        return "Payment failed";
+        return Map.of("message", "Appointment locked");
     }
 }
