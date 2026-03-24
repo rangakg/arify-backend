@@ -91,4 +91,34 @@ public class AppointmentService {
         slotRepo.save(slot);
         appointmentRepo.save(appt);
     }
+
+    @Transactional
+public void updateSlot(String phone, Long newSlotId) {
+
+    AppointmentEntity appt = appointmentRepo.findById(phone)
+            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+    SlotEntity oldSlot = appt.getSlot();
+
+    SlotEntity newSlot = slotRepo.findById(newSlotId)
+            .orElseThrow(() -> new RuntimeException("Invalid slot"));
+
+    // prevent double booking
+    if (newSlot.getStatus() != SlotStatus.AVAILABLE) {
+        throw new RuntimeException("Slot not available");
+    }
+
+    // free old slot
+    oldSlot.setStatus(SlotStatus.AVAILABLE);
+
+    // lock new slot
+    newSlot.setStatus(SlotStatus.LOCKED);
+
+    // update appointment
+    appt.setSlot(newSlot);
+
+    slotRepo.save(oldSlot);
+    slotRepo.save(newSlot);
+    appointmentRepo.save(appt);
+}
 }

@@ -112,4 +112,15 @@ public class AppointmentController {
 
         return Map.of("message", "Appointment cancelled");
     }
+
+    @PostMapping("/update")
+public Map<String, String> updateSlot(@RequestBody Map<String, String> req) {
+
+    String phone = req.get("phone");
+    Long slotId = Long.valueOf(req.get("slotId"));
+
+    appointmentService.updateSlot(phone, slotId);
+
+    return Map.of("message", "Slot updated");
+}
 }
