@@ -16,40 +16,82 @@ public class AppointmentService {
     private final SlotRepository slotRepo;
 
     // -----------------------
-    // CONFIRM BOOKING (STEP 6)
+    // CONFIRM BOOKING
     // -----------------------
     @Transactional
     public void confirmBooking(String phone, Long slotId) {
 
-        // ❌ prevent duplicate (phone is PK)
-        if (appointmentRepo.existsById(phone)) {
-            throw new RuntimeException("Appointment already exists");
-        }
-
         // 1. Get slot
-        SlotEntity slot = slotRepo.findById(slotId)
+        SlotEntity newSlot = slotRepo.findById(slotId)
                 .orElseThrow(() -> new RuntimeException("Invalid slot"));
 
-        // 2. Ensure slot still available
-        if (slot.getStatus() != SlotStatus.AVAILABLE) {
+        // 2. Find existing appointment
+        AppointmentEntity existing = appointmentRepo
+                .findTopByPhoneOrderByCreatedAtDesc(phone)
+                .orElse(null);
+
+        if (existing != null) {
+
+            // 🚫 If already PAID → block
+            if (existing.getStatus() == AppointmentStatus.PAID) {
+                throw new RuntimeException("Appointment already completed");
+            }
+
+            // 🔄 If LOCKED → update slot
+            if (existing.getStatus() == AppointmentStatus.LOCKED) {
+
+                SlotEntity oldSlot = existing.getSlot();
+
+                // release old slot
+                if (oldSlot != null) {
+                    oldSlot.setStatus(SlotStatus.AVAILABLE);
+                    slotRepo.save(oldSlot);
+                }
+
+                // ensure new slot available
+                if (newSlot.getStatus() != SlotStatus.AVAILABLE) {
+                    throw new RuntimeException("Slot already taken");
+                }
+
+                // lock new slot
+                newSlot.setStatus(SlotStatus.LOCKED);
+                slotRepo.save(newSlot);
+
+                // update appointment
+                existing.setSlot(newSlot);
+                existing.setDoctor(newSlot.getDoctor());
+                existing.setCreatedAt(OffsetDateTime.now());
+
+                appointmentRepo.save(existing);
+
+                return;
+            }
+        }
+
+        // -----------------------
+        // NEW BOOKING
+        // -----------------------
+
+        // ensure slot available
+        if (newSlot.getStatus() != SlotStatus.AVAILABLE) {
             throw new RuntimeException("Slot already taken");
         }
 
-        // 3. Create appointment (LOCKED, no orderId)
+        // lock slot
+        newSlot.setStatus(SlotStatus.LOCKED);
+        slotRepo.save(newSlot);
+
+        // create appointment
         AppointmentEntity appt = AppointmentEntity.builder()
                 .phone(phone)
-                .doctor(slot.getDoctor())
-                .slot(slot)
+                .doctor(newSlot.getDoctor())
+                .slot(newSlot)
                 .status(AppointmentStatus.LOCKED)
                 .createdAt(OffsetDateTime.now())
                 .orderId(null)
                 .build();
 
         appointmentRepo.save(appt);
-
-        // 4. Lock slot
-        slot.setStatus(SlotStatus.LOCKED);
-        slotRepo.save(slot);
     }
 
     // -----------------------
@@ -92,33 +134,37 @@ public class AppointmentService {
         appointmentRepo.save(appt);
     }
 
+    // -----------------------
+    // UPDATE SLOT (MANUAL CHANGE)
+    // -----------------------
     @Transactional
-public void updateSlot(String phone, Long newSlotId) {
+    public void updateSlot(String phone, Long newSlotId) {
 
-    AppointmentEntity appt = appointmentRepo.findById(phone)
-            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        AppointmentEntity appt = appointmentRepo.findById(phone)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-    SlotEntity oldSlot = appt.getSlot();
+        SlotEntity oldSlot = appt.getSlot();
 
-    SlotEntity newSlot = slotRepo.findById(newSlotId)
-            .orElseThrow(() -> new RuntimeException("Invalid slot"));
+        SlotEntity newSlot = slotRepo.findById(newSlotId)
+                .orElseThrow(() -> new RuntimeException("Invalid slot"));
 
-    // prevent double booking
-    if (newSlot.getStatus() != SlotStatus.AVAILABLE) {
-        throw new RuntimeException("Slot not available");
+        // prevent double booking
+        if (newSlot.getStatus() != SlotStatus.AVAILABLE) {
+            throw new RuntimeException("Slot not available");
+        }
+
+        // free old slot
+        oldSlot.setStatus(SlotStatus.AVAILABLE);
+
+        // lock new slot
+        newSlot.setStatus(SlotStatus.LOCKED);
+
+        // update appointment
+        appt.setSlot(newSlot);
+        appt.setDoctor(newSlot.getDoctor());
+
+        slotRepo.save(oldSlot);
+        slotRepo.save(newSlot);
+        appointmentRepo.save(appt);
     }
-
-    // free old slot
-    oldSlot.setStatus(SlotStatus.AVAILABLE);
-
-    // lock new slot
-    newSlot.setStatus(SlotStatus.LOCKED);
-
-    // update appointment
-    appt.setSlot(newSlot);
-
-    slotRepo.save(oldSlot);
-    slotRepo.save(newSlot);
-    appointmentRepo.save(appt);
-}
 }
