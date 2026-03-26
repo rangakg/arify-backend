@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.arify.pomi.repository.UserRepository;
 import com.arify.pomi.repository.AppointmentRepository;
+import com.arify.pomi.entity.AppointmentEntity;
 import com.arify.pomi.entity.AppointmentStatus;
 import com.arify.pomi.entity.UserEntity;
 
@@ -101,16 +102,34 @@ public class WebhookService {
             // STEP 2 : EXISTING USER
             // ----------------------------------
 
-            boolean hasAppointment = apptRepo.existsByPhoneAndStatus(phone, AppointmentStatus.LOCKED)
-                    || apptRepo.existsByPhoneAndStatus(phone, AppointmentStatus.PAID);
+            AppointmentEntity appt = apptRepo.findById(phone).orElse(null);
 
-            if (hasAppointment) {
+            if (appt != null) {
 
-                sender.sendTextMessage(
-                        phone,
-                        "You already have an active appointment.");
+                // ❌ Only block if PAID
+                if (appt.getStatus() == AppointmentStatus.PAID) {
 
-                return;
+                    sender.sendTextMessage(
+                            phone,
+                            "✅ You already have a confirmed appointment.");
+
+                    return;
+                }
+
+                // 🔥 LOCKED → SHOW CONTINUE FLOW
+                if (appt.getStatus() == AppointmentStatus.LOCKED) {
+
+                    String token = generateToken(phone);
+
+                    sender.sendTextMessage(
+                            phone,
+                            "⏳ You have a pending booking.\n\n" +
+                                    "You can continue payment or change your slot.");
+
+                    sender.sendBookingButton(phone, token);
+
+                    return;
+                }
             }
 
             // generate token for existing user
