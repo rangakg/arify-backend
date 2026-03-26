@@ -6,6 +6,7 @@ import com.arify.pomi.repository.UserRepository;
 import com.arify.pomi.repository.AppointmentRepository;
 import com.arify.pomi.entity.AppointmentEntity;
 import com.arify.pomi.entity.AppointmentStatus;
+import com.arify.pomi.entity.SlotEntity;
 import com.arify.pomi.entity.UserEntity;
 
 import org.slf4j.Logger;
@@ -104,32 +105,29 @@ public class WebhookService {
 
             AppointmentEntity appt = apptRepo.findById(phone).orElse(null);
 
-            if (appt != null) {
+            if (appt != null && appt.getStatus() == AppointmentStatus.LOCKED) {
 
-                // ❌ Only block if PAID
-                if (appt.getStatus() == AppointmentStatus.PAID) {
+                String token = generateToken(phone);
 
-                    sender.sendTextMessage(
-                            phone,
-                            "✅ You already have a confirmed appointment.");
+                SlotEntity slot = appt.getSlot();
 
-                    return;
-                }
+                String message = "⏳ You have a pending booking\n\n" +
+                        "Doctor: " + slot.getDoctor().getName() + "\n" +
+                        "Date: " + slot.getSlotTime().toLocalDate() + "\n" +
+                        "Time: " + slot.getSlotTime().toLocalTime() + "\n\n" +
+                        "Choose an option:";
 
-                // 🔥 LOCKED → SHOW CONTINUE FLOW
-                if (appt.getStatus() == AppointmentStatus.LOCKED) {
+                sender.sendTextMessage(phone, message);
 
-                    String token = generateToken(phone);
+                // 🔥 IMPORTANT: Send 2 buttons
+                sender.sendTwoButtons(
+                        phone,
+                        "Continue or change your booking",
+                        "Proceed to Payment",
+                        "Change Slot",
+                        token);
 
-                    sender.sendTextMessage(
-                            phone,
-                            "⏳ You have a pending booking.\n\n" +
-                                    "You can continue payment or change your slot.");
-
-                    sender.sendBookingButton(phone, token);
-
-                    return;
-                }
+                return;
             }
 
             // generate token for existing user
