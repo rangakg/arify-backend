@@ -10,6 +10,7 @@ import com.arify.pomi.entity.SlotEntity;
 import com.arify.pomi.entity.UserEntity;
 
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,21 +114,22 @@ public class WebhookService {
 
                 SlotEntity slot = appt.getSlot();
 
-                // String message = "⏳ You have a pending booking\n\n" +
                 ZoneId IST = ZoneId.of("Asia/Kolkata");
+
+                DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("hh:mm a");
+                DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
                 String message = "⏳ You have a pending booking\n\n" +
                         "Doctor: " + slot.getDoctor().getName() + "\n" +
                         "Date: " + slot.getSlotTime()
                                 .atZoneSameInstant(IST)
-                                .toLocalDate()
+                                .format(dateFmt)
                         + "\n" +
                         "Time: " + slot.getSlotTime()
                                 .atZoneSameInstant(IST)
-                                .toLocalTime()
+                                .format(timeFmt)
                         + "\n\n" +
                         "Choose an option:";
-
                 sender.sendTextMessage(phone, message);
 
                 // 🔥 IMPORTANT: Send 2 buttons
