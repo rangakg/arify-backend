@@ -9,6 +9,8 @@ import com.arify.pomi.entity.AppointmentStatus;
 import com.arify.pomi.entity.SlotEntity;
 import com.arify.pomi.entity.UserEntity;
 
+import java.time.ZoneId;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -111,10 +113,19 @@ public class WebhookService {
 
                 SlotEntity slot = appt.getSlot();
 
+                // String message = "⏳ You have a pending booking\n\n" +
+                ZoneId IST = ZoneId.of("Asia/Kolkata");
+
                 String message = "⏳ You have a pending booking\n\n" +
                         "Doctor: " + slot.getDoctor().getName() + "\n" +
-                        "Date: " + slot.getSlotTime().toLocalDate() + "\n" +
-                        "Time: " + slot.getSlotTime().toLocalTime() + "\n\n" +
+                        "Date: " + slot.getSlotTime()
+                                .atZoneSameInstant(IST)
+                                .toLocalDate()
+                        + "\n" +
+                        "Time: " + slot.getSlotTime()
+                                .atZoneSameInstant(IST)
+                                .toLocalTime()
+                        + "\n\n" +
                         "Choose an option:";
 
                 sender.sendTextMessage(phone, message);
