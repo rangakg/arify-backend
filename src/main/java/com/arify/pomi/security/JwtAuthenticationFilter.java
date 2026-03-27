@@ -29,7 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getServletPath();
+        // ✅ FIX: use full URI instead of servlet path
+        String path = request.getRequestURI();
 
         // ✅ Skip authentication for public endpoints
         if (path.startsWith("/api/auth")
