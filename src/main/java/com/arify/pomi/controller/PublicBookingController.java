@@ -73,4 +73,20 @@ public class PublicBookingController {
     // CREATE APPOINTMENT (LOCK SLOT)
     // ----------------------------------------------------
 
+    // ----------------------------------------------------
+    // GET APPOINTMENT BY TOKEN
+    // ----------------------------------------------------
+
+    // ----------------------------------------------------
+    // GET APPOINTMENT BY TOKEN
+    // ----------------------------------------------------
+
+    @GetMapping("/appointments/by-token")
+    public AppointmentEntity getAppointmentByToken(@RequestParam String token) {
+
+        String phone = tokenService.getPhone(token);
+
+        return appointmentRepo.findByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+    }
 }

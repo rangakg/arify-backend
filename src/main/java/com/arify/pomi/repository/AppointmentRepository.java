@@ -10,4 +10,7 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
     boolean existsByPhoneAndStatus(String phone, AppointmentStatus status);
 
     Optional<AppointmentEntity> findTopByPhoneOrderByCreatedAtDesc(String phone);
+
+    Optional<AppointmentEntity> findByPhone(String phone);
+
 }
