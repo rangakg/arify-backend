@@ -89,4 +89,23 @@ public class PublicBookingController {
         return appointmentRepo.findByPhone(phone)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
     }
+
+    @DeleteMapping("/appointments/cancel")
+    public Map<String, String> cancelAppointment(@RequestParam String token) {
+
+        String phone = tokenService.getPhone(token);
+
+        AppointmentEntity appt = appointmentRepo.findByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        // ✅ Allow delete ONLY for LOCKED
+        if (appt.getStatus() != AppointmentStatus.LOCKED) {
+            throw new RuntimeException("Only LOCKED appointments can be cancelled");
+        }
+
+        // ✅ DELETE (no slot manipulation needed in your system)
+        appointmentRepo.delete(appt);
+
+        return Map.of("message", "Appointment cancelled");
+    }
 }
