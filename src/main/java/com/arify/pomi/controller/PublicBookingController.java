@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/public")
@@ -93,17 +94,30 @@ public class PublicBookingController {
     @DeleteMapping("/appointments/cancel")
     public Map<String, String> cancelAppointment(@RequestParam String token) {
 
-        String phone = tokenService.getPhone(token);
+        String phone;
 
-        AppointmentEntity appt = appointmentRepo.findByPhone(phone)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
-
-        // ✅ Allow delete ONLY for LOCKED
-        if (appt.getStatus() != AppointmentStatus.LOCKED) {
-            throw new RuntimeException("Only LOCKED appointments can be cancelled");
+        // ✅ FIX 1: Handle invalid / already used token
+        try {
+            phone = tokenService.getPhone(token);
+        } catch (Exception e) {
+            return Map.of("message", "Already cancelled or expired");
         }
 
-        // ✅ DELETE (no slot manipulation needed in your system)
+        // ✅ FIX 2: Handle already deleted appointment
+        Optional<AppointmentEntity> optionalAppt = appointmentRepo.findByPhone(phone);
+
+        if (optionalAppt.isEmpty()) {
+            return Map.of("message", "Already cancelled");
+        }
+
+        AppointmentEntity appt = optionalAppt.get();
+
+        // ✅ FIX 3: Only allow LOCKED
+        if (appt.getStatus() != AppointmentStatus.LOCKED) {
+            return Map.of("message", "Cannot cancel this booking");
+        }
+
+        // ✅ FIX 4: Delete safely
         appointmentRepo.delete(appt);
 
         return Map.of("message", "Appointment cancelled");
