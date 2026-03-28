@@ -37,6 +37,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/public")
                 || path.startsWith("/webhook")) {
 
+            // ✅ CRITICAL FIX
+            SecurityContextHolder.clearContext();
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -45,6 +48,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // No JWT → continue without authentication
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+
+            // ✅ CRITICAL FIX
+            SecurityContextHolder.clearContext();
+
             filterChain.doFilter(request, response);
             return;
         }
