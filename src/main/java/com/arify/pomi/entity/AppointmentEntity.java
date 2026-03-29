@@ -22,6 +22,10 @@ public class AppointmentEntity {
     @Column(name = "phone")
     private String phone;
 
+    @ManyToOne
+    @JoinColumn(name = "phone", referencedColumnName = "phone", insertable = false, updatable = false)
+    private UserEntity user;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
     private DoctorEntity doctor;
